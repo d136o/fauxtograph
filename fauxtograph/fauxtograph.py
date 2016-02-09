@@ -12,6 +12,51 @@ import os
 from IPython.display import display
 import json
 
+class DataLoader(object):
+    
+    def __init__(self, filenames):
+        
+        '''
+        Parameters
+        ----------
+        
+        filenames: np.array[string]
+            A numpy array of filenames that this data loader will load
+        '''
+        
+        self.filenames_array = filenames
+        self.n_data = len(filenames)
+        
+
+    def fetch_pattern(self):
+        assert False, 'Implement pre fetching of as many of indices passed'
+                
+    def load_images(self, indices, mode='convolution'):
+        '''Load in image files from list of paths.
+
+        Parameters
+        ----------
+
+        indices : array[int]
+            indices to fetch
+
+        Returns
+        -------
+        images : array-like shape (n_images, n_colors, image_width, image_height)
+            Images normalized to have pixel data range [0,1].
+        
+        '''
+        def read(fname):
+            im = Image.open(fname)
+            im = np.float32(im)
+            return im/255.
+        x_all = np.array([read(fname) for fname in tqdm.tqdm(self.filenames_array[indices])])
+        x_all = x_all.astype('float32')
+        if self.mode == 'convolution':
+            x_all = x_all.transpose(0, 3, 1, 2)
+        print("Image Files Loaded!")
+        return x_all
+
 
 class VAE(object):
     '''Variational Auto-encoder Class for image data.
@@ -1242,7 +1287,7 @@ class VAEGAN(object):
 
     def fit(
         self,
-        img_data,
+        data_loader,
         gamma=1.0,
         save_freq=-1,
         pic_freq=-1,
@@ -1259,7 +1304,7 @@ class VAEGAN(object):
         Parameters
         ----------
 
-        img_data : array-like shape (n_images, n_colors, image_width, image_height)
+        data_loader : DataLoader object that won't load everthing to memory
             Images used to fit VAE model.
         gamma [optional] : float
             Sets the multiplicative factor that weights the relative importance of
@@ -1302,8 +1347,8 @@ class VAEGAN(object):
             self.enc_opt.add_hook(chainer.optimizer.WeightDecay(0.00001))
             self.dec_opt.add_hook(chainer.optimizer.WeightDecay(0.00001))
             self.disc_opt.add_hook(chainer.optimizer.WeightDecay(0.00001))
-
-        n_data = img_data.shape[0]
+            
+        n_data = data_loader.n_data
 
         batch_iter = list(range(0, n_data, batch_size))
         n_batches = len(batch_iter)
@@ -1324,7 +1369,7 @@ class VAEGAN(object):
             sum_l_prior = 0.
             count = 0
             for i in tqdm.tqdm(batch_iter):
-                x = img_data[indexes[i: i + batch_size]]
+                x = data_loader.get_indices(indexes[i: i + batch_size])
                 size = x.shape[0]
                 if mirroring:
                     for j in range(size):
@@ -1374,7 +1419,7 @@ class VAEGAN(object):
                 sum_l_prior += l_prior.data
                 count += 1
 
-                plot_data = img_data[indexes[:width]]
+                plot_data = x[indices[:width]]
                 if pic_freq > 0:
                     assert type(pic_freq) == int, "pic_freq must be an integer."
                     if count % pic_freq == 0:
