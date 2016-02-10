@@ -1419,7 +1419,7 @@ class VAEGAN(object):
                 sum_l_prior += l_prior.data
                 count += 1
 
-                plot_data = x[indexes[:width]]
+                plot_data = x[:width]
                 if pic_freq > 0:
                     assert type(pic_freq) == int, "pic_freq must be an integer."
                     if count % pic_freq == 0:
