@@ -14,7 +14,7 @@ import json
 
 class DataLoader(object):
     
-    def __init__(self, filenames):
+    def __init__(self, filenames, mode='convolution'):
         
         '''
         Parameters
@@ -26,12 +26,13 @@ class DataLoader(object):
         
         self.filenames_array = filenames
         self.n_data = len(filenames)
+        self.mode = 'convolution'
         
 
     def fetch_pattern(self):
         assert False, 'Implement pre fetching of as many of indices passed'
                 
-    def load_images(self, indices, mode='convolution'):
+    def load_images(self, indices):
         '''Load in image files from list of paths.
 
         Parameters
