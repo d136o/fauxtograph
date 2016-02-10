@@ -51,7 +51,7 @@ class DataLoader(object):
             im = Image.open(fname)
             im = np.float32(im)
             return im/255.
-        x_all = np.array([read(fname) for fname in tqdm.tqdm(self.filenames_array[indices])])
+        x_all = np.array([read(fname) for fname in self.filenames_array[indices] ])
         x_all = x_all.astype('float32')
         if self.mode == 'convolution':
             x_all = x_all.transpose(0, 3, 1, 2)
