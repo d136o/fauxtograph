@@ -55,7 +55,6 @@ class DataLoader(object):
         x_all = x_all.astype('float32')
         if self.mode == 'convolution':
             x_all = x_all.transpose(0, 3, 1, 2)
-        print("Image Files Loaded!")
         return x_all
 
 
