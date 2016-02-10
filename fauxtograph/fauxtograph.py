@@ -1369,7 +1369,7 @@ class VAEGAN(object):
             sum_l_prior = 0.
             count = 0
             for i in tqdm.tqdm(batch_iter):
-                x = data_loader.get_indices(indexes[i: i + batch_size])
+                x = data_loader.load_images(indexes[i: i + batch_size])
                 size = x.shape[0]
                 if mirroring:
                     for j in range(size):
